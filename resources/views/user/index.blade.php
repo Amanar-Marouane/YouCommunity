@@ -13,6 +13,12 @@
     <div class="alert {{ $messageType ?? 'alert-info' }}" role="alert">
         <h5>{{ $message ?? '' }}</h5>
     </div>
+    <div class="mb-4 text-white rounded-lg bg-green-500 border-l-4 border-green-700 shadow-md">
+        <p>{{ $success ?? '' }}</p>
+    </div>
+    <div class="mb-4 text-white rounded-lg bg-red-500 border-l-4 border-red-700 shadow-md">
+        <p>{{ $error ?? '' }}</p>
+    </div>
     <div class="container mx-auto px-4 py-8">
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex items-center space-x-4">
@@ -30,6 +36,14 @@
             </div>
         </div>
 
+
+        <form action="/profile" method="POST" class="inline">
+            @csrf
+            <button type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg mb-6 hover:bg-blue-700 transition duration-300">
+                Edit Profile
+            </button>
+        </form>
         <button onclick="toggleEventForm()"
             class="bg-blue-600 text-white px-6 py-2 rounded-lg mb-6 hover:bg-blue-700 transition duration-300">
             Add New Event
@@ -37,17 +51,22 @@
 
         <div id="eventForm" class="hidden bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 class="text-xl font-bold mb-4">Create New Event</h2>
-            <form action="/events" method="POST" class="space-y-4">
+            <form action="{{ route('event.create') }}" method="POST" class="space-y-4">
                 @csrf
+
                 <div>
                     <label class="block text-gray-700 mb-2" for="title">Event Title</label>
-                    <input type="text" id="title" name="title"
+                    <input type="text" id="title" name="title" value="{{ old('title') }}"
                         class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    <p class="text-sm text-gray-500">Required. Max: 255 characters.</p>
                 </div>
+
                 <div>
                     <label class="block text-gray-700 mb-2" for="description">Description</label>
-                    <textarea id="description" name="description" rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-2"></textarea>
+                    <textarea id="description" name="description" rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-2">{{ old('description') }}</textarea>
+                    <p class="text-sm text-gray-500">Required. Max: 1000 characters.</p>
                 </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-gray-700 mb-2" for="category">Category</label>
@@ -58,22 +77,30 @@
                             @endforeach
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-gray-700 mb-2" for="date">Date & Time</label>
-                        <input type="datetime-local" id="date" name="begin_at"
+                        <input type="datetime-local" id="date" name="begin_at" value="{{ old('begin_at') }}"
                             class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        <p class="text-sm text-gray-500">Required. Must be a future date.</p>
                     </div>
                 </div>
+
                 <div>
                     <label class="block text-gray-700 mb-2" for="location">Location</label>
-                    <input type="text" id="location" name="location"
+                    <input type="text" id="location" name="location" value="{{ old('location') }}"
                         class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    <p class="text-sm text-gray-500">Required. Max: 255 characters.</p>
                 </div>
+
                 <div>
                     <label class="block text-gray-700 mb-2" for="max_participants">Maximum Participants</label>
                     <input type="number" id="max_participants" name="max_participants"
+                        value="{{ old('max_participants') }}"
                         class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    <p class="text-sm text-gray-500">Required. Min: 10, Max: 1000.</p>
                 </div>
+
                 <button type="submit"
                     class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
                     Create Event
@@ -116,7 +143,8 @@
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </button>
-                                    <form action="/events/{{ $event->id }}" method="POST" class="inline">
+                                    <form action="{{ route('event.softDelete', ['id' => $event->id]) }}" method="POST"
+                                        class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-800">
@@ -139,6 +167,7 @@
     <script>
         function toggleEventForm() {
             const form = document.getElementById('eventForm');
+            form.querySelector("form").reset();
             form.classList.toggle('hidden');
         }
 

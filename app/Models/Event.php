@@ -10,14 +10,14 @@ class Event extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['is_deleted'];
+    protected $fillable = ['is_deleted', "title", "description", "category_id", "begin_at", "location", "max_participants", "user_id"];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function creator()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

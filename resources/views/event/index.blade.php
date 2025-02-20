@@ -34,7 +34,7 @@
                 <div class="bg-gray-800 rounded-lg overflow-hidden events-card">
                     <div class="p-6">
                         <p class="text-blue-400 text-sm mb-2 event-category">{{ $event->category->category }}</p>
-                        <form action="/event" method="POST">
+                        <form action="{{ route('event.show') }}" method="POST">
                             @csrf
                             <input type="hidden" name="id" value="{{ $event->id }}">
                             <button type="submit">

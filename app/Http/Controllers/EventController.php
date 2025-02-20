@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class EventController
 {
@@ -33,5 +34,26 @@ class EventController
         }
 
         return redirect('/profile')->with('message', $message);
+    }
+
+    public function insert(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string|max:1000',
+                'category_id' => 'required|exists:categories,id',
+                'begin_at' => 'required|date|after:today',
+                'location' => 'required|string|max:255',
+                'max_participants' => 'required|integer|min:10|max:1000',
+            ]);
+            $validatedData['user_id'] = Auth::id();
+
+            Event::create($validatedData);
+
+            return redirect()->back()->with('success', 'Event created successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to create event. Please try again.');
+        }
     }
 }

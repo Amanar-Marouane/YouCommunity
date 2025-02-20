@@ -81,7 +81,7 @@
                                 </svg>
                                 <div>
                                     <p class="text-gray-600">Creator</p>
-                                    <p class="font-semibold">{{ $event->creator->name }}</p>
+                                    <p class="font-semibold">{{ $event->user->name }}</p>
                                 </div>
                             </div>
                         </div>
