@@ -10,14 +10,11 @@
 
 <body class="bg-gray-100">
     <x-header></x-header>
-    <div class="alert {{ $messageType ?? 'alert-info' }}" role="alert">
-        <h5>{{ $message ?? '' }}</h5>
-    </div>
     <div class="mb-4 text-white rounded-lg bg-green-500 border-l-4 border-green-700 shadow-md">
-        <p>{{ $success ?? '' }}</p>
+        <p>{{ session('success') ?? '' }}</p>
     </div>
     <div class="mb-4 text-white rounded-lg bg-red-500 border-l-4 border-red-700 shadow-md">
-        <p>{{ $error ?? '' }}</p>
+        <p>{{ session('error') ?? '' }}</p>
     </div>
     <div class="container mx-auto px-4 py-8">
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">

@@ -16,7 +16,9 @@
         <section class="text-center mb-12">
             <h1 class="text-4xl font-bold text-white mb-4">Discover Local Events</h1>
             <p class="text-gray-400 mb-8">Find and join community events happening near you</p>
-            <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Create Event</button>
+            <a href="{{ route('profile') }}">
+                <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Create Event</button>
+            </a>
         </section>
 
         <section class="mb-12">
@@ -34,17 +36,16 @@
                 <div class="bg-gray-800 rounded-lg overflow-hidden events-card">
                     <div class="p-6">
                         <p class="text-blue-400 text-sm mb-2 event-category">{{ $event->category->category }}</p>
-                        <form action="{{ route('event.show') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="id" value="{{ $event->id }}">
+                        <a href="{{ route('event.show', $event->id) }}">
                             <button type="submit">
-                                <h3 class="text-white text-xl font-semibold mb-2 event-title">{{ $event->title }}</h3>
+                                <h3 class="text-white text-xl font-semibold mb-2 event-title">{{ $event->title }}
+                                </h3>
                             </button>
-                        </form>
+                        </a>
                         <p class="text-gray-400 mb-4 event-description">{{ $event->description }}</p>
                         <div>
                             <span class="text-gray-400 block event-date">{{ $event->begin_at }}</span>
-                            @unless ($event->creator_id == Auth::id())
+                            @unless ($event->user_id == Auth::id())
                                 <button
                                     class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mt-12">RSVP</button>
                             @else

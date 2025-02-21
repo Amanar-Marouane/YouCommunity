@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use Exception;
@@ -16,11 +17,11 @@ class EventController
         return view("event.index", compact('events'));
     }
 
-    public function showDetails(Request $request)
+    public function showDetails($id)
     {
-        $id = $request->input("id");
         $event = Event::find($id);
-        return view("event.show", compact('event'));
+        $comments = Comment::where('event_id', $id)->get();
+        return view("event.show", compact('event', "comments"));
     }
 
     public function softDelete($id)
