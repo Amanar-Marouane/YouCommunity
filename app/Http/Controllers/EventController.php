@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Comment, Event, Category};
+use App\Models\{Comment, Event, Category, Rsvp};
 use Illuminate\Http\Request;
-use Exception;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\{Auth, Mail};
+use App\Mail\MyMail;
 
 class EventController
 {
@@ -25,9 +25,33 @@ class EventController
 
     public function softDelete($id)
     {
+        $emails = Rsvp::where("event_id", $id)
+            ->with("user")
+            ->get()
+            ->map(function ($rsvp) {
+                return [
+                    "name" => $rsvp->user?->name,
+                    "email" => $rsvp->user?->email
+                ];
+            })->filter();
+
+        $eventName = Event::find($id)->title;
+
+        foreach ($emails as $email) {
+            $data = [
+                "name" => $email['name'],
+                "event_name" => $eventName,
+                "message" => "Event Has Been Canceled",
+            ];
+            Mail::to($email['email'])->queue(new MyMail($data));
+        }
+
+        Rsvp::where("event_id", $id)->delete();
         (new Event)->deleteSoft($id);
+
         return redirect('/profile')->with('success', "Event has been canceled successfully");
     }
+
 
     public function insert(Request $request)
     {
