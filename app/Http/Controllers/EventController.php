@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
+use App\Models\{Comment, Event, Category};
 use Illuminate\Http\Request;
-use App\Models\Event;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,15 +25,8 @@ class EventController
 
     public function softDelete($id)
     {
-        $message = 'Event has been deleted successfully';
-
-        try {
-            (new Event)->deleteSoft($id);
-        } catch (Exception $e) {
-            $message = 'Something Went Wrong';
-        }
-
-        return redirect('/profile')->with('message', $message);
+        (new Event)->deleteSoft($id);
+        return redirect('/profile')->with('success', "Event has been canceled successfully");
     }
 
     public function insert(Request $request)
@@ -56,5 +48,37 @@ class EventController
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to create event. Please try again.');
         }
+    }
+
+    public function edit($id)
+    {
+        $user_id = Auth::id();
+        $allowed_events_id = Event::where('user_id', $user_id)->pluck('id')->toArray();
+        if (!in_array($id, $allowed_events_id)) return redirect()->back()->with("error", "Access Denied");
+
+        $event = Event::find($id);
+        $categories = Category::all();
+        return view("event.edit", compact("event", "categories"));
+    }
+
+    public function update(Request $request)
+    {
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
+            'category_id' => 'required|exists:categories,id',
+            'begin_at' => 'required|date|after:today',
+            'location' => 'required|string|max:255',
+            'max_participants' => 'required|integer|min:10|max:1000',
+        ]);
+
+        $event = Event::find($request->input("id"));
+
+        if (!$event) {
+            return redirect(route("profile"))->with("error", "Access Denied Or Target Not Found");
+        }
+
+        $event->update($validatedData);
+        return redirect(route("profile"))->with("success", "Event updated successfully");
     }
 }
