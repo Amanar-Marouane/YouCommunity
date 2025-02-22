@@ -103,6 +103,29 @@ class EventController
         }
 
         $event->update($validatedData);
+
+        $emails = Rsvp::where("event_id", $request->id)
+            ->with("user")
+            ->get()
+            ->map(function ($rsvp) {
+                return [
+                    "name" => $rsvp->user?->name,
+                    "email" => $rsvp->user?->email
+                ];
+            })->filter();
+
+        $eventName = Event::find($request->id)->title;
+
+        foreach ($emails as $email) {
+            $data = [
+                "name" => $email['name'],
+                "event_name" => $eventName,
+                "message" => "Event Has Been Changed Please Review The Changes That Has Been Made 
+                            http://127.0.0.1:8000/event/$request->id",
+            ];
+            Mail::to($email['email'])->queue(new MyMail($data));
+        }
+
         return redirect(route("profile"))->with("success", "Event updated successfully");
     }
 }
