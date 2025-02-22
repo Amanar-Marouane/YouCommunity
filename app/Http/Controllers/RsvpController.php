@@ -18,4 +18,15 @@ class RsvpController extends Controller
         ]);
         return redirect()->back()->with("success", "You've reserved your place");
     }
+
+    public function cancel(Request $request)
+    {
+        $user_id = Auth::id();
+        $event_id = $request->id;
+        Rsvp::where('user_id', $user_id)
+            ->where('event_id', $event_id)
+            ->delete();
+
+        return redirect()->back()->with("success", "You've canceled your RSVP.");
+    }
 }
