@@ -19,4 +19,10 @@ class CommentController extends Controller
 
         return redirect()->route('event.show', ['id' => $validatedData['event_id']])->with('success', 'Comment added!');
     }
+
+    public function destroy(Request $request)
+    {
+        Comment::destroy($request->id);
+        return redirect()->back()->with("success", "Comment Has Been Deleted");
+    }
 }

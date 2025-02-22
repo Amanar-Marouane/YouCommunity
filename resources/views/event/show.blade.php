@@ -159,7 +159,7 @@
                 <div class="border-b border-gray-200 pb-6">
                     @if ($comments)
                         @foreach ($comments as $comment)
-                            <div class="flex items-start mb-2">
+                            <div class="flex items-start mb-2 group relative">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-600"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -168,7 +168,28 @@
                                 <div class="flex-1">
                                     <div class="flex justify-between items-center mb-1">
                                         <h4 class="font-bold text-gray-800">{{ $comment->user->name }}</h4>
-                                        <span class="text-sm text-gray-500">{{ $comment->formatted_date }}</span>
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="text-sm text-gray-500">{{ $comment->formatted_date }}</span>
+                                            @if ($comment->user->id == Auth::id())
+                                                <form action="{{ route('comment.destroy') }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <input type="hidden" name="id"
+                                                        value="{{ $comment->id }}">
+                                                    <button
+                                                        class="p-1 hover:bg-red-100 rounded-full transition-colors duration-200">
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="h-5 w-5 text-red-500" fill="none"
+                                                            viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </div>
                                     <p class="text-gray-600">{{ e($comment->content) }}</p>
                                 </div>

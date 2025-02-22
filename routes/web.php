@@ -14,6 +14,7 @@ Route::middleware('auth')->group(function () {
     Route::post("/event/reserve", [RsvpController::class, "reserve"])->name('event.reserve');
     Route::post("/event/cancel", [RsvpController::class, "cancel"])->name('event.cancel');
     Route::post('/event/comment', [CommentController::class, 'insert'])->name('comment.create');
+    Route::delete('/event/comment', [CommentController::class, 'destroy'])->name('comment.destroy');
     Route::post('/events', [EventController::class, 'insert'])->name('event.create');
     Route::patch('/events', [EventController::class, 'update'])->name('event.update');
     Route::get('/event/{id}/edit', [EventController::class, 'edit'])->name('event.edit');
