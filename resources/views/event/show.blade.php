@@ -11,12 +11,6 @@
 
 <body class="bg-gray-50">
     <x-header></x-header>
-    <div class="mb-4 text-white rounded-lg bg-green-500 border-l-4 border-green-700 shadow-md">
-        <p>{{ session('success') ?? '' }}</p>
-    </div>
-    <div class="mb-4 text-white rounded-lg bg-red-500 border-l-4 border-red-700 shadow-md">
-        <p>{{ session('error') ?? '' }}</p>
-    </div>
     <div class="container mx-auto px-4 py-8">
         <div class="bg-gray-900 text-white p-8 rounded-t-lg">
             <h1 class="text-3xl font-bold mb-4">{{ $event->title }}</h1>
@@ -66,7 +60,8 @@
                                 <div>
                                     <p class="text-gray-600">Participants</p>
                                     <p class="font-semibold">
-                                        {{ $event->current_participants_count }}/{{ $event->max_participants }}</p>
+                                        {{ count($event->current_participants_count) }}/{{ $event->max_participants }}
+                                    </p>
                                 </div>
                             </div>
                             <div class="flex items-center">
@@ -94,82 +89,97 @@
                     </div>
                     @auth
                         @if ($event->user_id != Auth::id())
-                            <button
-                                class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-                                Register For Event
-                            </button>
-                        @else
-                            <a href="/profile">
-                                <button
+                        @empty($event->is_reserved()->exists())
+                            <form action="{{ route('event.reserve') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="id" value="{{ $event->id }}">
+                                <button type="submit"
                                     class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-                                    You can manage this event from your dashboard
+                                    RSVP
                                 </button>
-                            </a>
-                        @endif
+                            </form>
+                        @else
+                            <form action="{{ route('event.cancel') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="id" value="{{ $event->id }}">
+                                <button type="submit"
+                                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+                                    Cancel
+                                </button>
+                            </form>
+                        @endempty
                     @else
-                        <a href="/login">
+                        <a href="/profile">
                             <button
                                 class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-                                Sign In First
+                                You can manage this event from your dashboard
                             </button>
                         </a>
-                    @endauth
-                </div>
+                    @endif
+                @else
+                    <a href="/login">
+                        <button
+                            class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+                            Sign In First
+                        </button>
+                    </a>
+                @endauth
             </div>
         </div>
+    </div>
 
-        <div class="container mx-auto px-4 py-8">
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <h2 class="text-2xl font-bold mb-6">Comments</h2>
-                @auth
-                    <form class="mb-8" action="{{ route('comment.create') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="user_id" value="{{ Auth::id() }}">
-                        <input type="hidden" name="event_id" value="{{ $event->id }}">
-                        <div class="mb-4">
-                            <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">Leave a
-                                comment</label>
-                            <textarea id="comment" rows="4" name="content"
-                                class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                                placeholder="Share your thoughts about this event..."></textarea>
-                        </div>
-                        <button type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300">Post
-                            Comment</button>
-                    </form>
-                @else
-                    <div class="bg-gray-50 p-6 rounded-lg mb-8 text-center">
-                        <p class="text-gray-600 mb-4">Please sign in to leave a comment</p>
-                        <a href="/login"
-                            class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300">Sign
-                            In</a>
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-6">Comments</h2>
+            @auth
+                <form class="mb-8" action="{{ route('comment.create') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="user_id" value="{{ Auth::id() }}">
+                    <input type="hidden" name="event_id" value="{{ $event->id }}">
+                    <div class="mb-4">
+                        <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">Leave a
+                            comment</label>
+                        <textarea id="comment" rows="4" name="content"
+                            class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                            placeholder="Share your thoughts about this event..."></textarea>
                     </div>
-                @endauth
-                <div class="space-y-6">
-                    <div class="border-b border-gray-200 pb-6">
-                        @if ($comments)
-                            @foreach ($comments as $comment)
-                                <div class="flex items-start mb-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-600"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    <div class="flex-1">
-                                        <div class="flex justify-between items-center mb-1">
-                                            <h4 class="font-bold text-gray-800">{{ $comment->user->name }}</h4>
-                                            <span class="text-sm text-gray-500">{{ $comment->formatted_date }}</span>
-                                        </div>
-                                        <p class="text-gray-600">{{ e($comment->content) }}</p>
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300">Post
+                        Comment</button>
+                </form>
+            @else
+                <div class="bg-gray-50 p-6 rounded-lg mb-8 text-center">
+                    <p class="text-gray-600 mb-4">Please sign in to leave a comment</p>
+                    <a href="/login"
+                        class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300">Sign
+                        In</a>
+                </div>
+            @endauth
+            <div class="space-y-6">
+                <div class="border-b border-gray-200 pb-6">
+                    @if ($comments)
+                        @foreach ($comments as $comment)
+                            <div class="flex items-start mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-600"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <h4 class="font-bold text-gray-800">{{ $comment->user->name }}</h4>
+                                        <span class="text-sm text-gray-500">{{ $comment->formatted_date }}</span>
                                     </div>
+                                    <p class="text-gray-600">{{ e($comment->content) }}</p>
                                 </div>
-                            @endforeach
-                        @endif
-                    </div>
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+</div>
 </body>
 
 </html>

@@ -10,6 +10,12 @@
 </head>
 
 <body class="bg-gray-50">
+    <div class="mb-4 text-white rounded-lg bg-green-500 border-l-4 border-green-700 shadow-md">
+        <p>{{ session('success') ?? '' }}</p>
+    </div>
+    <div class="mb-4 text-white rounded-lg bg-red-500 border-l-4 border-red-700 shadow-md">
+        <p>{{ session('error') ?? '' }}</p>
+    </div>
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-4xl mx-auto space-y-4">
             <div class="bg-white rounded-lg shadow-lg p-8">

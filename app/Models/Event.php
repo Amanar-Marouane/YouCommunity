@@ -5,6 +5,7 @@ namespace App\Models;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Event extends Model
 {
@@ -27,5 +28,15 @@ class Event extends Model
         $event = Event::find($id);
         $event ? $event->is_deleted = 1 : throw new Exception('Event not found');
         $event->save();
+    }
+
+    public function current_participants_count()
+    {
+        return $this->hasMany(Rsvp::class);
+    }
+
+    public function is_reserved()
+    {
+        return $this->current_participants_count()->where('user_id', Auth::id());
     }
 }

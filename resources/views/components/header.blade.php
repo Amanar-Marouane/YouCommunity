@@ -8,9 +8,9 @@
             </div>
             <div class="hidden md:block">
                 <div class="ml-10 flex items-center space-x-8">
+                    <a href="/home"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Home</a>
                     @auth
-                        <a href="/home"
-                            class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Home</a>
                         <a href="/profile"
                             class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Profile</a>
                         <a href="/logout">
@@ -39,3 +39,9 @@
         </nav>
     </div>
 </header>
+<div class="mb-4 text-white rounded-lg bg-green-500 border-l-4 border-green-700 shadow-md">
+    <p>{{ session('success') ?? '' }}</p>
+</div>
+<div class="mb-4 text-white rounded-lg bg-red-500 border-l-4 border-red-700 shadow-md">
+    <p>{{ session('error') ?? '' }}</p>
+</div>

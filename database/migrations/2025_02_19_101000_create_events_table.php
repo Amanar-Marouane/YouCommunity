@@ -22,7 +22,6 @@ return new class extends Migration
             $table->foreign("user_id")->references("id")->on("users")->onDelete('cascade');
             $table->dateTime("begin_at");
             $table->unsignedBigInteger("max_participants");
-            $table->unsignedBigInteger("current_participants_count")->default(0);
             $table->timestamps();
             $table->boolean("is_deleted")->default(false);
         });

@@ -46,8 +46,32 @@
                         <div>
                             <span class="text-gray-400 block event-date">{{ $event->begin_at }}</span>
                             @unless ($event->user_id == Auth::id())
-                                <button
-                                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mt-12">RSVP</button>
+                                @auth
+                                    @empty($event->is_reserved()->exists())
+                                        <form action="{{ route('event.reserve') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $event->id }}">
+                                            <button type="submit"
+                                                class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mt-12">
+                                                RSVP
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('event.cancel') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $event->id }}">
+                                            <button type="submit"
+                                                class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mt-12">
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    @endempty
+                                @else
+                                    <a href="{{ route('login') }}"><button
+                                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mt-12">Sign
+                                            In
+                                            First</button></a>
+                                @endauth
                             @else
                                 <div class="mt-4 flex items-center p-4 bg-gray-700 rounded-lg border border-gray-600">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400 mr-2"
@@ -55,7 +79,8 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                     </svg>
-                                    <p class="text-gray-300 font-medium">You can manage this event from your dashboard</p>
+                                    <p class="text-gray-300 font-medium">You can manage this event from your dashboard
+                                    </p>
                                 </div>
                             @endunless
                         </div>

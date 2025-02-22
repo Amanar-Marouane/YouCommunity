@@ -10,11 +10,6 @@
 
 <body class="bg-gray-100">
     <x-header></x-header>
-    <div class="mb-4 text-white rounded-lg bg-green-500 border-l-4 border-green-700 shadow-md">
-        <p>{{ session('success') ?? '' }}</p>
-    </div>
-    <div class="mb-4 text-white rounded-lg bg-red-500 border-l-4 border-red-700 shadow-md">
-        <p>{{ session('error') ?? '' }}</p>
     </div>
     <div class="container mx-auto px-4 py-8">
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -126,7 +121,7 @@
                                         </span>
                                         <span
                                             class="inline-block bg-green-100 text-green-800 text-sm px-2 py-1 rounded ml-2">
-                                            {{ $event->current_participants_count }}/{{ $event->max_participants }}
+                                            {{ count($event->current_participants_count) }}/{{ $event->max_participants }}
                                             participants
                                         </span>
                                     </div>
