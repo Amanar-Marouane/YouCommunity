@@ -3,7 +3,7 @@
 use App\Http\Controllers\{CommentController, EventController, ProfileController, RsvpController, UserController};
 use Illuminate\Support\Facades\Route;
 
-Route::get('/home', [EventController::class, "showIndex"]);
+Route::get('/home', [EventController::class, "showIndex"])->name("home");
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [UserController::class, 'showIndex'])->name('profile');

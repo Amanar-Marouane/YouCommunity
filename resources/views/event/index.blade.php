@@ -31,6 +31,37 @@
             </div>
         </section>
 
+        <div class="bg-gray-800 p-4 rounded-lg mb-8">
+            <form class="flex flex-col md:flex-row gap-4" method="GET" action="{{ route('home') }}">
+                <select class="flex-1 bg-gray-700 text-white px-4 py-2 rounded-md" onchange="this.form.submit()"
+                    name="category_id">
+                    <option disabled>Select Category</option>
+                    <option value="" {{ request('category_id') == null ? 'selected' : '' }}>All Categories
+                    </option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}"
+                            {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->category }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <input type="datetime-local" class="flex-1 bg-gray-700 text-white px-4 py-2 rounded-md" name="date"
+                    value="{{ request('date') ? request('date') : '' }}" placeholder="Select Date"
+                    onchange="this.form.submit()">
+
+                <select class="flex-1 bg-gray-700 text-white px-4 py-2 rounded-md" onchange="this.form.submit()"
+                    name="location">
+                    <option disabled>Select Location</option>
+                    <option value="" {{ request('location') == null ? 'selected' : '' }}>All Locations</option>
+                    @foreach ($locations as $location)
+                        <option value="{{ $location }}" {{ request('location') == $location ? 'selected' : '' }}>
+                            {{ $location }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+        </div>
+
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($events as $event)
                 <div class="bg-gray-800 rounded-lg overflow-hidden events-card">

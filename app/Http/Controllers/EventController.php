@@ -10,28 +10,40 @@ use App\Mail\MyMail;
 class EventController
 {
 
-    public function showIndex()
+    public function showIndex(Request $request)
     {
-        $events = Event::all();
-        return view("event.index", compact('events'));
+        $location = $request->query('location') ?? null;
+        $category_id = $request->query('category_id') ?? null;
+        $date = $request->query('date') ?? null;
+
+        $events = Event::query();
+        if ($location) $events->where('location', $location);
+        if ($category_id) $events->where('category_id', $category_id);
+        if ($date) $events->whereDate('begin_at', $date);
+        $events = $events->get();
+
+        $categories = Category::all();
+        $locations = Event::all()->pluck('location');
+
+        return view('event.index', compact('events', 'categories', 'locations'));
     }
 
     public function showDetails($id)
     {
         $event = Event::find($id);
         $comments = Comment::where('event_id', $id)->get();
-        return view("event.show", compact('event', "comments"));
+        return view('event.show', compact('event', 'comments'));
     }
 
     public function softDelete($id)
     {
-        $emails = Rsvp::where("event_id", $id)
-            ->with("user")
+        $emails = Rsvp::where('event_id', $id)
+            ->with('user')
             ->get()
             ->map(function ($rsvp) {
                 return [
-                    "name" => $rsvp->user?->name,
-                    "email" => $rsvp->user?->email
+                    'name' => $rsvp->user?->name,
+                    'email' => $rsvp->user?->email
                 ];
             })->filter();
 
@@ -39,17 +51,17 @@ class EventController
 
         foreach ($emails as $email) {
             $data = [
-                "name" => $email['name'],
-                "event_name" => $eventName,
-                "message" => "Event Has Been Canceled",
+                'name' => $email['name'],
+                'event_name' => $eventName,
+                'message' => 'Event Has Been Canceled',
             ];
             Mail::to($email['email'])->queue(new MyMail($data));
         }
 
-        Rsvp::where("event_id", $id)->delete();
+        Rsvp::where('event_id', $id)->delete();
         (new Event)->deleteSoft($id);
 
-        return redirect('/profile')->with('success', "Event has been canceled successfully");
+        return redirect('/profile')->with('success', 'Event has been canceled successfully');
     }
 
 
@@ -78,11 +90,11 @@ class EventController
     {
         $user_id = Auth::id();
         $allowed_events_id = Event::where('user_id', $user_id)->pluck('id')->toArray();
-        if (!in_array($id, $allowed_events_id)) return redirect()->back()->with("error", "Access Denied");
+        if (!in_array($id, $allowed_events_id)) return redirect()->back()->with('error', 'Access Denied');
 
         $event = Event::find($id);
         $categories = Category::all();
-        return view("event.edit", compact("event", "categories"));
+        return view('event.edit', compact('event', 'categories'));
     }
 
     public function update(Request $request)
@@ -96,21 +108,21 @@ class EventController
             'max_participants' => 'required|integer|min:10|max:1000',
         ]);
 
-        $event = Event::find($request->input("id"));
+        $event = Event::find($request->input('id'));
 
         if (!$event) {
-            return redirect(route("profile"))->with("error", "Access Denied Or Target Not Found");
+            return redirect(route('profile'))->with('error', 'Access Denied Or Target Not Found');
         }
 
         $event->update($validatedData);
 
-        $emails = Rsvp::where("event_id", $request->id)
-            ->with("user")
+        $emails = Rsvp::where('event_id', $request->id)
+            ->with('user')
             ->get()
             ->map(function ($rsvp) {
                 return [
-                    "name" => $rsvp->user?->name,
-                    "email" => $rsvp->user?->email
+                    'name' => $rsvp->user?->name,
+                    'email' => $rsvp->user?->email
                 ];
             })->filter();
 
@@ -118,14 +130,14 @@ class EventController
 
         foreach ($emails as $email) {
             $data = [
-                "name" => $email['name'],
-                "event_name" => $eventName,
-                "message" => "Event Has Been Changed Please Review The Changes That Has Been Made 
-                            http://127.0.0.1:8000/event/$request->id",
+                'name' => $email['name'],
+                'event_name' => $eventName,
+                'message' => 'Event Has Been Changed Please Review The Changes That Has Been Made 
+                            http://127.0.0.1:8000/event/$request->id',
             ];
             Mail::to($email['email'])->queue(new MyMail($data));
         }
 
-        return redirect(route("profile"))->with("success", "Event updated successfully");
+        return redirect(route('profile'))->with('success', 'Event updated successfully');
     }
 }
