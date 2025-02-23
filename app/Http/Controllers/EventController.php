@@ -35,7 +35,7 @@ class EventController
         return view('event.show', compact('event', 'comments'));
     }
 
-    public function softDelete($id)
+    public function delete($id)
     {
         $emails = Rsvp::where('event_id', $id)
             ->with('user')
@@ -59,7 +59,8 @@ class EventController
         }
 
         Rsvp::where('event_id', $id)->delete();
-        (new Event)->deleteSoft($id);
+        $event = Event::find($id);
+        $event->delete($id);
 
         return redirect('/profile')->with('success', 'Event has been canceled successfully');
     }

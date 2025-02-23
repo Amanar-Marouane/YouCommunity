@@ -18,7 +18,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/events', [EventController::class, 'insert'])->name('event.create');
     Route::patch('/events', [EventController::class, 'update'])->name('event.update');
     Route::get('/event/{id}/edit', [EventController::class, 'edit'])->name('event.edit');
-    Route::delete('/events/{id}', [EventController::class, 'softDelete'])->name('event.softDelete');
+    Route::delete('/events/{id}', [EventController::class, 'delete'])->name('event.softDelete');
 });
 Route::get('/event/{id}', [EventController::class, "showDetails"])->name('event.show');
 
