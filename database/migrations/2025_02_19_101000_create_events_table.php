@@ -23,7 +23,6 @@ return new class extends Migration
             $table->dateTime("begin_at");
             $table->unsignedBigInteger("max_participants");
             $table->timestamps();
-            $table->boolean("is_deleted")->default(false);
         });
     }
 
